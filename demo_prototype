@@ -4,6 +4,7 @@ import numpy
 import random
 import time
 
+
 # import random for random move computer opponent
 
 
@@ -24,6 +25,7 @@ CIRCLE_COLOUR = (100, 20, 50)
 LINE_COLOUR = (250, 250, 250)
 BLACK = (0, 0, 0)
 PLAYER_2_COLOUR = (0, 100, 200)
+WIN_COLOUR = (80, 150, 200)
 
 my_font = pygame.font.SysFont('Comic Sans MS', 20)
 computer_win_text = my_font.render('Game over, you lose', False, BLACK)
@@ -73,23 +75,32 @@ def get_marking_coordinate(row, col):
 
 def someone_won():
 
-    for col in range(0, 3):
-        if board[col][0] == 0:
-            continue
-        if board[col][0] == board[col][1] == board[col][2]:
-
-            # return the player
-            print(board[col][0])
-            return int(board[col][0])
-
     for row in range(0, 3):
-        if board[0][row] == 0:
+        if board[row][0] == 0:
             continue
-        if board[0][row] == board[1][row] == board[2][row]:
+        if board[row][0] == board[row][1] == board[row][2]:
 
             # return the player
-            print(board[0][row])
-            return int(board[0][row])
+            pygame.draw.line(screen, WIN_COLOUR, (50, coordinate_array[row]), (550, coordinate_array[row]), width=10)
+            return int(board[row][0])
+
+    for col in range(0, 3):
+        if board[0][col] == 0:
+            continue
+        if board[0][col] == board[1][col] == board[2][col]:
+
+            # return the player
+            pygame.draw.line(screen, WIN_COLOUR, (coordinate_array[col], 50), (coordinate_array[col], 550), width=10)
+            return int(board[0][col])
+
+    if board[0][0] != 0:
+        if board[0][0] == board[1][1] == board[2][2]:
+            pygame.draw.line(screen, WIN_COLOUR, (50, 50), (550, 550), 10)
+            return int(board[0][0])
+    if board[0][2] != 0:
+        if board[0][2] == board[1][1] == board[2][0]:
+            pygame.draw.line(screen, WIN_COLOUR, (50, 550), (550, 50), 10)
+            return int(board[0][2])
 
     return 0
 
@@ -168,28 +179,43 @@ def draw_the_lines():
 draw_the_lines()
 
 
+def restart():
+    global player, game_over
+    screen.fill(BG_COLOUR)
+    for i in range(3):
+        for j in range(3):
+            board[i][j] = 0
+    draw_the_lines()
+    player = 1
+    game_over = 0
+
+
+
 while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            position = pygame.mouse.get_pos()
-            x_position = event.pos[0]
-            y_position = event.pos[1]
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                position = pygame.mouse.get_pos()
+                x_position = event.pos[0]
+                y_position = event.pos[1]
 
-            # made a separate function for updating board
+                # made a separate function for updating board
 
-            make_move(y_position, x_position)
+                make_move(y_position, x_position)
 
-            print(board)
-            if game_over:
-                if game_over == 2:
-                    screen.blit(computer_win_text, (0, 0))
-                elif game_over == 1:
-                    screen.blit(player_win_text, (0, 0))
-                pygame.display.update()
+                if game_over:
+                    if game_over == 2:
+                        screen.blit(computer_win_text, (0, 0))
+                    elif game_over == 1:
+                        screen.blit(player_win_text, (0, 0))
+                    pygame.display.update()
+                    time.sleep(1)
+                    restart()
+                    pygame.display.update()
 
-                break
-            # for viewing the console board, can be deleted later
+                    break
+                # for viewing the console board, can be deleted later
 
-    pygame.display.update()
+        pygame.display.update()
